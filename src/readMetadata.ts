@@ -15,6 +15,9 @@ import {
 import { graphql, parse } from 'graphql';
 
 function readFile(inputPath: string[], yamlLoad = true): unknown {
+  if (!fs.existsSync(path.join(...inputPath))) {
+    throw new Error(`Input file not found: ${path.join(...inputPath)}`);
+  }
   try {
     const file = fs.readFileSync(path.join(...inputPath)).toString();
 
@@ -61,6 +64,16 @@ function readSources(inputDir: string): Source[] {
 }
 
 export function readMetadata(inputDir: string): HasuraMetadataV3 {
+  if (!fs.existsSync(inputDir)) {
+    throw new Error(`Input directory not found: ${inputDir}`);
+  }
+
+  if (!fs.existsSync(path.join(inputDir, 'version.yaml'))) {
+    throw new Error(
+      `Unable to find version.yaml, check if input directory is valid hasura metadata directory: ${inputDir}`
+    );
+  }
+
   const version = readFile([inputDir, 'version.yaml']) as {
     version: number;
   };
