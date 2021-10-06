@@ -17,8 +17,13 @@ function writeFile(outputPath: string[], file: any, yamlDump = true) {
 }
 
 function clearDirectory(outputDir: string): void {
-  fs.rmSync(outputDir, { recursive: true, force: true });
-  fs.mkdirSync(outputDir);
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  if (fs.existsSync(path.join(outputDir, 'databases'))) {
+    fs.rmdirSync(path.join(outputDir, 'databases'), { recursive: true });
+  }
 }
 
 export function writeMetadata(
