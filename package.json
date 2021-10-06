@@ -2,11 +2,23 @@
   "name": "hasura-metadata-merge",
   "version": "1.0.0",
   "description": "Utility to merge hasura config v3 metadata",
-  "main": "src/index.js",
-  "directories": {
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
     "test": "ts-node tests/index.ts",
-    "build": "tsc",
-    "prepublish": "tsc"
+    "build": "tsc"
+  },
+  "keywords": [
+    "hasura",
+    "metadata",
+    "merge"
+  ],
+  "author": "benoit ranque",
+  "license": "MIT",
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/benoitranque/hasura-metadata-merge.git"
   },
   "dependencies": {
     "@graphql-tools/load-files": "^6.5.0",
@@ -22,15 +34,5 @@
     "nodemon": "^2.0.12",
     "ts-node": "^10.2.1",
     "typescript": "^4.4.3"
-  },
-  "scripts": {
-    "test": "ts-node tests/index.ts",
-    "build": "tsc"
-  },
-  "keywords": [
-    "hasura"
-  ],
-  "author": "benoit ranque",
-  "license": "MIT",
-  "type": "module"
+  }
 }
