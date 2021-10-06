@@ -11,11 +11,6 @@ import { loadFilesSync } from '@graphql-tools/load-files';
 import { mergeTypeDefs } from '@graphql-tools/merge';
 import { print } from 'graphql';
 
-const loadedFiles = loadFilesSync(`${__dirname}/schema/**/*.graphql`);
-const typeDefs = mergeTypeDefs(loadedFiles);
-const printedTypeDefs = print(typeDefs);
-fs.writeFileSync('joined.graphql', printedTypeDefs);
-
 export function mergeMetadataDirectories(
   sourceDirectories: string[],
   targetDirectory: string
@@ -44,6 +39,8 @@ export function mergeMetadataDirectories(
       throwOnConflict: true,
       consistentEnumMerge: true,
       useSchemaDefinition: false,
+      ignoreFieldConflicts: false,
+      forceSchemaDefinition: false,
     });
 
     console.log(
