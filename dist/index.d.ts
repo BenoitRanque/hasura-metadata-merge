@@ -1,0 +1,1 @@
+export { mergeMetadataDirectories } from './mergeMetadataDirectories';
