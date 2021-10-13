@@ -15,7 +15,6 @@
   ],
   "author": "benoit ranque",
   "license": "MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/benoitranque/hasura-metadata-merge.git"
