@@ -1,7 +1,14 @@
-import fs from 'fs';
+import fs, { read } from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { HasuraMetadataV3, Source, Action } from './HasuraMetadataV3';
+import {
+  HasuraMetadataV3,
+  Source,
+  Action,
+  RestEndpoint,
+  ApiLimits,
+  InheritedRole,
+} from './HasuraMetadataV3';
 import {
   getAllActionsFromSdl,
   getAllTypesFromSdl,
@@ -15,6 +22,17 @@ import {
   RemoteSchema,
   TableEntry,
 } from '@hasura/metadata';
+
+function readFileOptional(
+  inputPath: string[],
+  yamlLoad = true
+): unknown | undefined {
+  if (!fs.existsSync(path.join(...inputPath))) {
+    return undefined;
+  }
+
+  return readFile(inputPath, yamlLoad);
+}
 
 function readFile(inputPath: string[], yamlLoad = true): unknown {
   try {
@@ -293,17 +311,23 @@ export function readMetadata(inputDir: string): HasuraMetadataV3 {
     cron_triggers: readFile([inputDir, 'cron_triggers.yaml']) as CronTrigger[],
     query_collections: readFile([
       inputDir,
-      'cron_triggers.yaml',
+      'query_collections.yaml',
     ]) as QueryCollectionEntry[],
     remote_schemas: readFile([
       inputDir,
       'remote_schemas.yaml',
     ]) as RemoteSchema[],
-    // TODO: add typing for rest_endpoints
-    // rest_endpoints: yaml.load(
-    //   readFile(path.join(inputDir, "rest_endpoints.yaml"))
-    // ) as RestEnpoints[],
+    rest_endpoints: readFile([
+      inputDir,
+      'rest_endpoints.yaml',
+    ]) as RestEndpoint[],
     sources: readSources(inputDir),
+    api_limits: readFileOptional([inputDir, 'api_limits.yaml']) as
+      | ApiLimits
+      | undefined,
+    inherited_roles: readFileOptional([inputDir, 'api_limits.yaml']) as
+      | InheritedRole[]
+      | undefined,
   };
 
   return metadata;

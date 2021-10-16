@@ -26,13 +26,13 @@ type MergeConfigObject<T> = {
   array_children?: MergeConfigArrayChildren<T>;
 };
 type MergeConfigObjectChildren<T> = {
-  [K in ObjectProperties<T>]?: Omit<
+  [K in ObjectProperties<T>]: Omit<
     MergeConfigObject<NonNullable<T[K]>>,
     'identity'
   >;
 };
 type MergeConfigArrayChildren<T> = {
-  [K in ArrayProperties<T>]?: MergeConfigObject<ArrayElement<T[K]>>;
+  [K in ArrayProperties<T>]: MergeConfigObject<ArrayElement<T[K]>>;
 };
 type MergeError = {
   message: string;

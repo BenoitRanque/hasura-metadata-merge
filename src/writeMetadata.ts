@@ -74,8 +74,14 @@ export function writeMetadata(
   writeFile([outputDir, 'cron_triggers.yaml'], metadata.cron_triggers);
   writeFile([outputDir, 'query_collections.yaml'], metadata.query_collections);
   writeFile([outputDir, 'remote_schemas.yaml'], metadata.remote_schemas);
-  console.warn('writing out empty rest_endpoints.yaml file. TODO: fix this.');
-  writeFile([outputDir, 'rest_endpoints.yaml'], []);
+  writeFile([outputDir, 'rest_endpoints.yaml'], metadata.rest_endpoints);
+
+  if (metadata.api_limits) {
+    writeFile([outputDir, 'api_limits.yaml'], metadata.api_limits);
+  }
+  if (metadata.inherited_roles) {
+    writeFile([outputDir, 'inherited_roles.yaml'], metadata.inherited_roles);
+  }
 
   fs.mkdirSync(path.join(outputDir, 'databases'));
 
