@@ -1,14 +1,17 @@
 import fs from 'fs';
 import path from 'path';
 import yaml from 'js-yaml';
-import { HasuraMetadataV3 } from './HasuraMetadataV3';
+import { HasuraMetadataV3, Action } from './HasuraMetadataV3';
+import { CustomTypes } from '@hasura/metadata';
+import { getSdlComplete } from './shared/utils/sdlUtils';
+import { reformCustomTypes } from './shared/utils/hasuraCustomTypeUtils';
 
 function writeFile(outputPath: string[], file: any, yamlDump = true) {
   try {
     fs.writeFileSync(
       path.join(...outputPath),
       yamlDump
-        ? yaml.dump(file, { noArrayIndent: true, quotingType: '"' })
+        ? yaml.dump(file, { noArrayIndent: true, quotingType: `'` })
         : file
     );
   } catch (error) {
@@ -17,13 +20,39 @@ function writeFile(outputPath: string[], file: any, yamlDump = true) {
 }
 
 function clearDirectory(outputDir: string): void {
-  if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
-  }
+  fs.rmSync(outputDir, { recursive: true, force: true });
+  fs.mkdirSync(outputDir);
+}
 
-  if (fs.existsSync(path.join(outputDir, 'databases'))) {
-    fs.rmdirSync(path.join(outputDir, 'databases'), { recursive: true });
-  }
+export function writeActions(
+  outputDir: string,
+  {
+    actions = [],
+    custom_types = reformCustomTypes([]),
+  }: { actions: Action[] | undefined; custom_types: CustomTypes | undefined }
+) {
+  const sdl = getSdlComplete(actions, custom_types);
+
+  writeFile([outputDir, 'actions.graphql'], sdl, false);
+
+  // remove data that does not belong in actions.yaml
+  const ymlPayload = {
+    actions: actions.map((action) => {
+      delete action.definition.type;
+      delete action.definition.arguments;
+      delete action.definition.output_type;
+
+      return action;
+    }),
+    custom_types: {
+      enums: custom_types.enums?.map(({ name }) => ({ name })) ?? [],
+      input_objects:
+        custom_types.input_objects?.map(({ name }) => ({ name })) ?? [],
+      objects: custom_types.objects?.map(({ name }) => ({ name })) ?? [],
+      scalars: custom_types.scalars?.map(({ name }) => ({ name })) ?? [],
+    },
+  };
+  writeFile([outputDir, 'actions.yaml'], ymlPayload);
 }
 
 export function writeMetadata(
@@ -37,7 +66,7 @@ export function writeMetadata(
   writeFile([outputDir, 'version.yaml'], {
     version: metadata.version,
   });
-  writeFile([outputDir, 'actions.yaml'], {
+  writeActions(outputDir, {
     actions: metadata.actions,
     custom_types: metadata.custom_types,
   });
