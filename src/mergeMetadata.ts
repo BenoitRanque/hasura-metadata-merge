@@ -20,19 +20,26 @@ type ArrayElement<ArrayType extends readonly unknown[]> =
   ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 type MergeConfigObject<T> = {
   identity: (source: T) => string;
-  conflictCheck: (sourceA: T, sourceB: T) => string | string[] | null;
-  merge: (objs: [T, ...T[]], children: Pick<T, ArrayProperties<T>>) => T;
-  object_children?: MergeConfigObjectChildren<T>;
-  array_children?: MergeConfigArrayChildren<T>;
+  conflictCheck?: (sourceA: T, sourceB: T) => string | string[] | null;
+  merge?: (
+    objs: [T, ...T[]],
+    children: Pick<T, ArrayProperties<T> | ObjectProperties<T>>
+  ) => T;
+  object_children?: ObjectProperties<T> extends never
+    ? never
+    : MergeConfigObjectChildren<T>;
+  array_children?: ArrayProperties<T> extends never
+    ? never
+    : MergeConfigArrayChildren<T>;
 };
 type MergeConfigObjectChildren<T> = {
-  [K in ObjectProperties<T>]: Omit<
+  [K in ObjectProperties<T>]-?: Omit<
     MergeConfigObject<NonNullable<T[K]>>,
     'identity'
   >;
 };
 type MergeConfigArrayChildren<T> = {
-  [K in ArrayProperties<T>]: MergeConfigObject<ArrayElement<T[K]>>;
+  [K in ArrayProperties<T>]-?: MergeConfigObject<ArrayElement<T[K]>>;
 };
 type MergeError = {
   message: string;
@@ -54,7 +61,9 @@ function mergeMetadataObjects<T>(
   sources.forEach(([originA, sourceA], index) => {
     if (sources.length > index + 1) {
       sources.slice(index + 1).forEach(([originB, sourceB]) => {
-        const conflictMessages = config.conflictCheck(sourceA, sourceB);
+        const conflictMessages = config.conflictCheck
+          ? config.conflictCheck(sourceA, sourceB)
+          : null;
 
         if (conflictMessages) {
           if (Array.isArray(conflictMessages)) {
@@ -128,7 +137,14 @@ function mergeMetadataObjects<T>(
         })
       );
 
-  return config.merge(
+  const defaultMergeFn = (
+    [item]: [T, ...T[]],
+    children: Pick<T, ArrayProperties<T> | ObjectProperties<T>>
+  ) => (typeof item === 'object' ? { ...item, ...children } : item);
+
+  const mergeFn = config.merge ?? defaultMergeFn;
+
+  return mergeFn(
     [sources[0][1], ...sources.slice(1).map(([origin, source]) => source)],
     {
       ...array_children,

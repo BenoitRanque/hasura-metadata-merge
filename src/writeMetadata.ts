@@ -3,7 +3,7 @@ import path from 'path';
 import yaml from 'js-yaml';
 import { HasuraMetadataV3, Action } from './HasuraMetadataV3';
 import { CustomTypes } from '@hasura/metadata';
-import { getSdlComplete } from './shared/utils/sdlUtils';
+import { getActionDefinitionSdl, getTypesSdl } from './shared/utils/sdlUtils';
 import { reformCustomTypes } from './shared/utils/hasuraCustomTypeUtils';
 
 function writeFile(outputPath: string[], file: any, yamlDump = true) {
@@ -31,7 +31,18 @@ export function writeActions(
     custom_types = reformCustomTypes([]),
   }: { actions: Action[] | undefined; custom_types: CustomTypes | undefined }
 ) {
-  const sdl = getSdlComplete(actions, custom_types);
+  const sdl = actions
+    .map((a) =>
+      getActionDefinitionSdl(
+        a.name,
+        a.definition.type,
+        a.definition.arguments,
+        a.definition.output_type,
+        a.comment
+      )
+    )
+    .concat([getTypesSdl(custom_types)])
+    .join('');
 
   writeFile([outputDir, 'actions.graphql'], sdl, false);
 
@@ -118,5 +129,32 @@ export function writeMetadata(
         table
       );
     });
+
+    if (source.functions) {
+      fs.mkdirSync(path.join(outputDir, 'databases', source.name, 'functions'));
+
+      writeFile(
+        [outputDir, 'databases', source.name, 'functions', 'functions.yaml'],
+        source.functions.map((fn) =>
+          typeof fn.function === 'string'
+            ? `!include ${fn.function}.yaml`
+            : `!include ${fn.function.schema}_${fn.function.name}.yaml`
+        )
+      );
+
+      source.functions.forEach((fn) => {
+        writeFile(
+          [
+            outputDir,
+            'databases',
+            source.name,
+            typeof fn.function === 'string'
+              ? `!include ${fn.function}.yaml`
+              : `!include ${fn.function.schema}_${fn.function.name}.yaml`,
+          ],
+          fn
+        );
+      });
+    }
   });
 }

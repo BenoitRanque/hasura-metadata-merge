@@ -17,6 +17,7 @@ import { reformCustomTypes } from './shared/utils/hasuraCustomTypeUtils';
 import {
   AllowList,
   CronTrigger,
+  CustomFunction,
   CustomTypes,
   QueryCollectionEntry,
   RemoteSchema,
@@ -72,10 +73,33 @@ function readSources(inputDir: string): Source[] {
       return table;
     });
 
-    // todo: read functions
+    const functionList = source.functions
+      ? (readFile([
+          inputDir,
+          'databases',
+          source.name,
+          'functions',
+          'functions.yaml',
+        ]) as string[])
+      : undefined;
+
+    const functions: CustomFunction[] | undefined = functionList
+      ? functionList.map((fnPath) => {
+          const fn = readFile([
+            inputDir,
+            'databases',
+            source.name,
+            'functions',
+            fnPath.replace('!include ', ''),
+          ]) as CustomFunction;
+
+          return fn;
+        })
+      : undefined;
     return {
       ...source,
       tables,
+      functions,
     };
   });
 }
@@ -325,7 +349,7 @@ export function readMetadata(inputDir: string): HasuraMetadataV3 {
     api_limits: readFileOptional([inputDir, 'api_limits.yaml']) as
       | ApiLimits
       | undefined,
-    inherited_roles: readFileOptional([inputDir, 'api_limits.yaml']) as
+    inherited_roles: readFileOptional([inputDir, 'inherited_roles.yaml']) as
       | InheritedRole[]
       | undefined,
   };
