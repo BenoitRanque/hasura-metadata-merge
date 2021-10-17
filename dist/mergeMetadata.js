@@ -22,13 +22,16 @@ var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logMergeErrors = exports.mergeMetadata = void 0;
 function mergeMetadataObjects(sources, config, location, errors) {
+    var _a;
     // check for conflicts against every other object of the same type
     sources.forEach(function (_a, index) {
         var originA = _a[0], sourceA = _a[1];
         if (sources.length > index + 1) {
             sources.slice(index + 1).forEach(function (_a) {
                 var originB = _a[0], sourceB = _a[1];
-                var conflictMessages = config.conflictCheck(sourceA, sourceB);
+                var conflictMessages = config.conflictCheck
+                    ? config.conflictCheck(sourceA, sourceB)
+                    : null;
                 if (conflictMessages) {
                     if (Array.isArray(conflictMessages)) {
                         conflictMessages.forEach(function (message) {
@@ -79,7 +82,12 @@ function mergeMetadataObjects(sources, config, location, errors) {
                     : undefined,
             ];
         }));
-    return config.merge(__spreadArray([sources[0][1]], sources.slice(1).map(function (_a) {
+    var defaultMergeFn = function (_a, children) {
+        var item = _a[0];
+        return (typeof item === 'object' ? __assign(__assign({}, item), children) : item);
+    };
+    var mergeFn = (_a = config.merge) !== null && _a !== void 0 ? _a : defaultMergeFn;
+    return mergeFn(__spreadArray([sources[0][1]], sources.slice(1).map(function (_a) {
         var origin = _a[0], source = _a[1];
         return source;
     }), true), __assign(__assign({}, array_children), object_children));
@@ -112,9 +120,9 @@ function mergeMetadata(sources, config) {
 }
 exports.mergeMetadata = mergeMetadata;
 function logMergeErrors(errors) {
-    console.log('The following errors where encountered while attempting to merge metadata:');
+    console.warn('The following errors where encountered while attempting to merge metadata:');
     errors.forEach(function (error) {
-        console.log("location: " + error.location.join('.') + "\n" + error.message + "\norigin A " + error.originA + "\norigin B " + error.originB + "\n");
+        console.error("location: " + error.location.join('.') + "\n" + error.message + "\norigin A " + error.originA + "\norigin B " + error.originB + "\n");
     });
 }
 exports.logMergeErrors = logMergeErrors;

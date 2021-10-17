@@ -11,16 +11,16 @@ declare type ArrayProperties<T> = {
 declare type ArrayElement<ArrayType extends readonly unknown[]> = ArrayType extends readonly (infer ElementType)[] ? ElementType : never;
 declare type MergeConfigObject<T> = {
     identity: (source: T) => string;
-    conflictCheck: (sourceA: T, sourceB: T) => string | string[] | null;
-    merge: (objs: [T, ...T[]], children: Pick<T, ArrayProperties<T>>) => T;
-    object_children?: MergeConfigObjectChildren<T>;
-    array_children?: MergeConfigArrayChildren<T>;
+    conflictCheck?: (sourceA: T, sourceB: T) => string | string[] | null;
+    merge?: (objs: [T, ...T[]], children: Pick<T, ArrayProperties<T> | ObjectProperties<T>>) => T;
+    object_children?: ObjectProperties<T> extends never ? never : MergeConfigObjectChildren<T>;
+    array_children?: ArrayProperties<T> extends never ? never : MergeConfigArrayChildren<T>;
 };
 declare type MergeConfigObjectChildren<T> = {
-    [K in ObjectProperties<T>]?: Omit<MergeConfigObject<NonNullable<T[K]>>, 'identity'>;
+    [K in ObjectProperties<T>]-?: Omit<MergeConfigObject<NonNullable<T[K]>>, 'identity'>;
 };
 declare type MergeConfigArrayChildren<T> = {
-    [K in ArrayProperties<T>]?: MergeConfigObject<ArrayElement<T[K]>>;
+    [K in ArrayProperties<T>]-?: MergeConfigObject<ArrayElement<T[K]>>;
 };
 declare type MergeError = {
     message: string;

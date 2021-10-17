@@ -127,8 +127,58 @@ export interface Source {
 export interface Action extends Omit<v2Action, 'permissions'> {
     permissions?: Permission[];
 }
+export interface ApiLimits {
+    type: 'set_api_limits';
+    args: {
+        disabled: boolean;
+        depth_limit?: {
+            global: number;
+            per_role: {
+                [name: string]: number;
+            };
+        };
+        node_limit?: {
+            global: number;
+            per_role: {
+                [name: string]: number;
+            };
+        };
+        rate_limit?: {
+            global: {
+                unique_params: string;
+                max_reqs_per_min: 10;
+            };
+            per_role: {
+                [name: string]: {
+                    unique_params: string[];
+                    max_reqs_per_min: 20;
+                };
+            };
+        };
+    };
+}
+export interface RestEndpoint {
+    name: string;
+    url: string;
+    methods: ('POST' | 'PUT' | 'PATCH')[];
+    definition: RestEndpointDefinition;
+    comment?: string;
+}
+export interface RestEndpointDefinition {
+    query: {
+        query_name: string;
+        collection_name: string;
+    };
+}
+export interface InheritedRole {
+    role_name: string;
+    role_set: string[];
+}
 export interface HasuraMetadataV3 extends Omit<HasuraMetadataV2, 'tables' | 'functions' | 'actions'> {
     actions?: Action[];
     version: 3;
     sources: Source[];
+    api_limits?: ApiLimits;
+    rest_endpoints: RestEndpoint[];
+    inherited_roles?: InheritedRole[];
 }
