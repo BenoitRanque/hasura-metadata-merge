@@ -124,9 +124,9 @@ Should you run into issues when using this package, you can open an issue or con
 
 #### Changelog
 
-1.1.0 - corrected new types, added `modifyMetadata` argument to `mergeMetadataDirectories`, exposed `readMetadata` and `writeMetadata`
-1.0.1 - added coverage for entire metadata object, missing types.
-1.0.0 - initial release, only partial coverate of the metadata object api. No release tag
+- 1.1.0 - corrected new types, added `modifyMetadata` argument to `mergeMetadataDirectories`, exposed `readMetadata` and `writeMetadata`
+- 1.0.1 - added coverage for entire metadata object, missing types.
+- 1.0.0 - initial release, only partial coverate of the metadata object api. No release tag
 
 #### Licence
 
