@@ -10,7 +10,11 @@ The utility can be instaled as an npm module:
 npm install git+https://github.com/BenoitRanque/hasura-metadata-merge.git
 ```
 
-To install a specific version,
+To install a specific version, append the tag to the uri like so:
+
+```bash
+npm install git+https://github.com/BenoitRanque/hasura-metadata-merge.git#1.1.0
+```
 
 #### Usage
 
