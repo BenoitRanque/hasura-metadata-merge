@@ -198,9 +198,6 @@ export function mergeMetadata(
 }
 
 export function logMergeErrors(errors: MergeError[]) {
-  console.warn(
-    'The following errors where encountered while attempting to merge metadata:'
-  );
   errors.forEach((error) => {
     console.error(`location: ${error.location.join('.')}
 ${error.message}

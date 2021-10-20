@@ -10,6 +10,15 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __spreadArray = (this && this.__spreadArray) || function (to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.mergeConfig = void 0;
 // utility to concatenate unique comment strings.
@@ -150,7 +159,105 @@ exports.mergeConfig = {
             },
         },
         api_limits: {
-            conflictCheck: function (a, b) { return (a.type !== b.type ? "" : null); },
+            conflictCheck: function (a, b) {
+                return a.disabled !== b.disabled
+                    ? "Mismatching \"disabled\" value for api limit\""
+                    : null;
+            },
+            object_children: {
+                depth_limit: {
+                    conflictCheck: function (a, b) {
+                        var errors = [];
+                        // check if globals mismatch
+                        if (a.global !== b.global) {
+                            errors.push("Mismatching global value for depth limit of api limits:\nGlobal A: " + a.global + "\nGlobal B: " + b.global);
+                        }
+                        if (a.per_role && b.per_role) {
+                            // check if role present in multiple objects have diferent values
+                            for (var role in a.per_role) {
+                                if (role in b.per_role) {
+                                    if (a.per_role[role] !== b.per_role[role]) {
+                                        errors.push("Mismatching value for role " + role + " of depth limit of api limits:\n  Role " + role + " A: " + a.per_role[role] + "\n  Role " + role + " B: " + b.per_role[role]);
+                                    }
+                                }
+                            }
+                        }
+                        return errors.length ? errors : null;
+                    },
+                    merge: function (limits) { return ({
+                        global: limits[0].global,
+                        per_role: Object.assign.apply(Object, __spreadArray([{}], limits.map(function (limit) { return limit.per_role; }), false)),
+                    }); },
+                },
+                node_limit: {
+                    conflictCheck: function (a, b) {
+                        var errors = [];
+                        // check if globals mismatch
+                        if (a.global !== b.global) {
+                            errors.push("Mismatching global value for node limit of api limits\nGlobal A: " + a.global + "\nGlobal B: " + b.global);
+                        }
+                        if (a.per_role && b.per_role) {
+                            // check if role present in multiple objects have diferent values
+                            for (var role in a.per_role) {
+                                if (role in b.per_role) {
+                                    if (a.per_role[role] !== b.per_role[role]) {
+                                        errors.push("Mismatching value for role " + role + " of node limit of api limits:\n  Role " + role + " A: " + a.per_role[role] + "\n  Role " + role + " B: " + b.per_role[role]);
+                                    }
+                                }
+                            }
+                        }
+                        return errors.length ? errors : null;
+                    },
+                    merge: function (limits) { return ({
+                        global: limits[0].global,
+                        per_role: Object.assign.apply(Object, __spreadArray([{}], limits.map(function (limit) { return limit.per_role; }), false)),
+                    }); },
+                },
+                rate_limit: {
+                    conflictCheck: function (a, b) {
+                        var errors = [];
+                        function isRateLimitRuleConflict(ruleA, ruleB) {
+                            // if these values do not match, error
+                            if (ruleA.max_reqs_per_min !== ruleB.max_reqs_per_min)
+                                return true;
+                            // if a is falsy, and b is not, error
+                            if (!ruleA.unique_params && ruleB.unique_params)
+                                return true;
+                            // if a is IP and b is not, error
+                            if (ruleA.unique_params === 'IP' && ruleB.unique_params !== 'IP')
+                                return true;
+                            // if a is array...
+                            if (Array.isArray(ruleA.unique_params)) {
+                                // ...and b is not, error
+                                if (!Array.isArray(ruleB.unique_params))
+                                    return true;
+                                // copy, sort, join, and compare the two arrays, if unequal error
+                                if (ruleA.unique_params.slice().sort().join(',') !==
+                                    ruleB.unique_params.slice().sort().join(','))
+                                    return true;
+                            }
+                            return false;
+                        }
+                        if (isRateLimitRuleConflict(a.global, b.global)) {
+                            errors.push("Mismatching configuration for global rate limit:\nRate Limit A: " + JSON.stringify(a.global) + "\nRate Limit B: " + JSON.stringify(b.global));
+                        }
+                        if (a.per_role && b.per_role) {
+                            for (var role in a.per_role) {
+                                if (role in b.per_role) {
+                                    if (isRateLimitRuleConflict(a.per_role[role], b.per_role[role])) {
+                                        errors.push("Mismatching configuration for global rate limit:\nRate Limit for Role " + role + ": " + JSON.stringify(a.per_role[role]) + "\nRate Limit for Role " + role + ": " + JSON.stringify(b.per_role[role]));
+                                    }
+                                }
+                            }
+                        }
+                        return errors.length ? errors : null;
+                    },
+                    merge: function (limits) { return ({
+                        global: limits[0].global,
+                        per_role: Object.assign.apply(Object, __spreadArray([{}], limits.map(function (limit) { return limit.per_role; }), false)),
+                    }); },
+                },
+            },
         },
     },
     array_children: {

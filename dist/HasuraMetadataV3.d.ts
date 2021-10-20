@@ -127,34 +127,32 @@ export interface Source {
 export interface Action extends Omit<v2Action, 'permissions'> {
     permissions?: Permission[];
 }
-export interface ApiLimits {
-    type: 'set_api_limits';
-    args: {
-        disabled: boolean;
-        depth_limit?: {
-            global: number;
-            per_role: {
-                [name: string]: number;
-            };
-        };
-        node_limit?: {
-            global: number;
-            per_role: {
-                [name: string]: number;
-            };
-        };
-        rate_limit?: {
-            global: {
-                unique_params: string;
-                max_reqs_per_min: 10;
-            };
-            per_role: {
-                [name: string]: {
-                    unique_params: string[];
-                    max_reqs_per_min: 20;
-                };
-            };
-        };
+export interface APILimits {
+    depth_limit?: DepthLimit;
+    disabled: boolean;
+    rate_limit?: RateLimit;
+    node_limit?: NodeLimit;
+}
+export interface DepthLimit {
+    global: number;
+    per_role: {
+        [role: string]: number;
+    };
+}
+export interface RateLimit {
+    global: RateLimitRule;
+    per_role: {
+        [role: string]: RateLimitRule;
+    };
+}
+export interface RateLimitRule {
+    unique_params: null | 'IP' | string[];
+    max_reqs_per_min: number;
+}
+export interface NodeLimit {
+    global: number;
+    per_role: {
+        [role: string]: number;
     };
 }
 export interface RestEndpoint {
@@ -178,7 +176,7 @@ export interface HasuraMetadataV3 extends Omit<HasuraMetadataV2, 'tables' | 'fun
     actions?: Action[];
     version: 3;
     sources: Source[];
-    api_limits?: ApiLimits;
+    api_limits?: APILimits;
     rest_endpoints: RestEndpoint[];
     inherited_roles?: InheritedRole[];
 }

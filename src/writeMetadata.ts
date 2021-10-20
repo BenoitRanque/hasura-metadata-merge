@@ -24,7 +24,7 @@ function clearDirectory(outputDir: string): void {
   fs.mkdirSync(outputDir);
 }
 
-export function writeActions(
+function writeActions(
   outputDir: string,
   {
     actions = [],

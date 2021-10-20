@@ -14,7 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.writeMetadata = exports.writeActions = void 0;
+exports.writeMetadata = void 0;
 var fs_1 = __importDefault(require("fs"));
 var path_1 = __importDefault(require("path"));
 var js_yaml_1 = __importDefault(require("js-yaml"));
@@ -74,7 +74,6 @@ function writeActions(outputDir, _a) {
     };
     writeFile([outputDir, 'actions.yaml'], ymlPayload);
 }
-exports.writeActions = writeActions;
 function writeMetadata(outputDir, metadata) {
     console.log('Clearing output directory');
     clearDirectory(outputDir);

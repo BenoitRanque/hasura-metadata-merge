@@ -120,7 +120,6 @@ function mergeMetadata(sources, config) {
 }
 exports.mergeMetadata = mergeMetadata;
 function logMergeErrors(errors) {
-    console.warn('The following errors where encountered while attempting to merge metadata:');
     errors.forEach(function (error) {
         console.error("location: " + error.location.join('.') + "\n" + error.message + "\norigin A " + error.originA + "\norigin B " + error.originB + "\n");
     });

@@ -6,7 +6,7 @@ import {
   Source,
   Action,
   RestEndpoint,
-  ApiLimits,
+  APILimits,
   InheritedRole,
 } from './HasuraMetadataV3';
 import {
@@ -347,7 +347,7 @@ export function readMetadata(inputDir: string): HasuraMetadataV3 {
     ]) as RestEndpoint[],
     sources: readSources(inputDir),
     api_limits: readFileOptional([inputDir, 'api_limits.yaml']) as
-      | ApiLimits
+      | APILimits
       | undefined,
     inherited_roles: readFileOptional([inputDir, 'inherited_roles.yaml']) as
       | InheritedRole[]

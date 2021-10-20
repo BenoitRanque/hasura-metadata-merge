@@ -1,3 +1,4 @@
+import { RateLimitRule } from './HasuraMetadataV3';
 import { MergeConfigRoot } from './mergeMetadata';
 
 // utility to concatenate unique comment strings.
@@ -142,7 +143,139 @@ Type B ${JSON.stringify(b)}`
       },
     },
     api_limits: {
-      conflictCheck: (a, b) => (a.type !== b.type ? `` : null),
+      conflictCheck: (a, b) =>
+        a.disabled !== b.disabled
+          ? `Mismatching "disabled" value for api limit"`
+          : null,
+      object_children: {
+        depth_limit: {
+          conflictCheck: (a, b) => {
+            const errors: string[] = [];
+            // check if globals mismatch
+            if (a.global !== b.global) {
+              errors.push(`Mismatching global value for depth limit of api limits:
+Global A: ${a.global}
+Global B: ${b.global}`);
+            }
+            if (a.per_role && b.per_role) {
+              // check if role present in multiple objects have diferent values
+              for (const role in a.per_role) {
+                if (role in b.per_role) {
+                  if (a.per_role[role] !== b.per_role[role]) {
+                    errors.push(`Mismatching value for role ${role} of depth limit of api limits:
+  Role ${role} A: ${a.per_role[role]}
+  Role ${role} B: ${b.per_role[role]}`);
+                  }
+                }
+              }
+            }
+            return errors.length ? errors : null;
+          },
+          merge: (limits) => ({
+            global: limits[0].global,
+            per_role: Object.assign(
+              {},
+              ...limits.map((limit) => limit.per_role)
+            ),
+          }),
+        },
+        node_limit: {
+          conflictCheck: (a, b) => {
+            const errors: string[] = [];
+            // check if globals mismatch
+            if (a.global !== b.global) {
+              errors.push(`Mismatching global value for node limit of api limits
+Global A: ${a.global}
+Global B: ${b.global}`);
+            }
+            if (a.per_role && b.per_role) {
+              // check if role present in multiple objects have diferent values
+              for (const role in a.per_role) {
+                if (role in b.per_role) {
+                  if (a.per_role[role] !== b.per_role[role]) {
+                    errors.push(`Mismatching value for role ${role} of node limit of api limits:
+  Role ${role} A: ${a.per_role[role]}
+  Role ${role} B: ${b.per_role[role]}`);
+                  }
+                }
+              }
+            }
+            return errors.length ? errors : null;
+          },
+          merge: (limits) => ({
+            global: limits[0].global,
+            per_role: Object.assign(
+              {},
+              ...limits.map((limit) => limit.per_role)
+            ),
+          }),
+        },
+        rate_limit: {
+          conflictCheck: (a, b) => {
+            const errors: string[] = [];
+
+            function isRateLimitRuleConflict(
+              ruleA: RateLimitRule,
+              ruleB: RateLimitRule
+            ): boolean {
+              // if these values do not match, error
+              if (ruleA.max_reqs_per_min !== ruleB.max_reqs_per_min)
+                return true;
+
+              // if a is falsy, and b is not, error
+              if (!ruleA.unique_params && ruleB.unique_params) return true;
+
+              // if a is IP and b is not, error
+              if (ruleA.unique_params === 'IP' && ruleB.unique_params !== 'IP')
+                return true;
+
+              // if a is array...
+              if (Array.isArray(ruleA.unique_params)) {
+                // ...and b is not, error
+                if (!Array.isArray(ruleB.unique_params)) return true;
+
+                // copy, sort, join, and compare the two arrays, if unequal error
+                if (
+                  ruleA.unique_params.slice().sort().join(',') !==
+                  ruleB.unique_params.slice().sort().join(',')
+                )
+                  return true;
+              }
+
+              return false;
+            }
+
+            if (isRateLimitRuleConflict(a.global, b.global)) {
+              errors.push(`Mismatching configuration for global rate limit:
+Rate Limit A: ${JSON.stringify(a.global)}
+Rate Limit B: ${JSON.stringify(b.global)}`);
+            }
+
+            if (a.per_role && b.per_role) {
+              for (const role in a.per_role) {
+                if (role in b.per_role) {
+                  if (
+                    isRateLimitRuleConflict(a.per_role[role], b.per_role[role])
+                  ) {
+                    errors.push(`Mismatching configuration for global rate limit:
+Rate Limit for Role ${role}: ${JSON.stringify(a.per_role[role])}
+Rate Limit for Role ${role}: ${JSON.stringify(b.per_role[role])}`);
+                  }
+                }
+              }
+            }
+
+            return errors.length ? errors : null;
+          },
+          merge: (limits) => ({
+            global: limits[0].global,
+            per_role: Object.assign(
+              {},
+              ...limits.map((limit) => limit.per_role)
+            ),
+          }),
+        },
+      },
     },
   },
   array_children: {
