@@ -13,7 +13,7 @@ npm install git+https://github.com/BenoitRanque/hasura-metadata-merge.git
 To install a specific version, append the tag to the uri like so:
 
 ```bash
-npm install git+https://github.com/BenoitRanque/hasura-metadata-merge.git#1.1.0
+npm install git+https://github.com/BenoitRanque/hasura-metadata-merge.git#1.1.1
 ```
 
 #### Usage
