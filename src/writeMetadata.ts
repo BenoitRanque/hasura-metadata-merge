@@ -56,11 +56,27 @@ function writeActions(
       return action;
     }),
     custom_types: {
-      enums: custom_types.enums?.map(({ name }) => ({ name })) ?? [],
+      enums:
+        custom_types.enums?.map(({ name, description }) => ({
+          name,
+          description,
+        })) ?? [],
       input_objects:
-        custom_types.input_objects?.map(({ name }) => ({ name })) ?? [],
-      objects: custom_types.objects?.map(({ name }) => ({ name })) ?? [],
-      scalars: custom_types.scalars?.map(({ name }) => ({ name })) ?? [],
+        custom_types.input_objects?.map(({ name, description }) => ({
+          name,
+          description,
+        })) ?? [],
+      objects:
+        custom_types.objects?.map(({ name, description, relationships }) => ({
+          name,
+          description,
+          relationships,
+        })) ?? [],
+      scalars:
+        custom_types.scalars?.map(({ name, description }) => ({
+          name,
+          description,
+        })) ?? [],
     },
   };
   writeFile([outputDir, 'actions.yaml'], ymlPayload);
