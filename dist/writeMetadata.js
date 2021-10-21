@@ -55,20 +55,33 @@ function writeActions(outputDir, _a) {
         }),
         custom_types: {
             enums: (_c = (_b = custom_types.enums) === null || _b === void 0 ? void 0 : _b.map(function (_a) {
-                var name = _a.name;
-                return ({ name: name });
+                var name = _a.name, description = _a.description;
+                return ({
+                    name: name,
+                    description: description,
+                });
             })) !== null && _c !== void 0 ? _c : [],
             input_objects: (_e = (_d = custom_types.input_objects) === null || _d === void 0 ? void 0 : _d.map(function (_a) {
-                var name = _a.name;
-                return ({ name: name });
+                var name = _a.name, description = _a.description;
+                return ({
+                    name: name,
+                    description: description,
+                });
             })) !== null && _e !== void 0 ? _e : [],
             objects: (_g = (_f = custom_types.objects) === null || _f === void 0 ? void 0 : _f.map(function (_a) {
-                var name = _a.name;
-                return ({ name: name });
+                var name = _a.name, description = _a.description, relationships = _a.relationships;
+                return ({
+                    name: name,
+                    description: description,
+                    relationships: relationships,
+                });
             })) !== null && _g !== void 0 ? _g : [],
             scalars: (_j = (_h = custom_types.scalars) === null || _h === void 0 ? void 0 : _h.map(function (_a) {
-                var name = _a.name;
-                return ({ name: name });
+                var name = _a.name, description = _a.description;
+                return ({
+                    name: name,
+                    description: description,
+                });
             })) !== null && _j !== void 0 ? _j : [],
         },
     };
