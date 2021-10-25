@@ -164,6 +164,7 @@ export function writeMetadata(
             outputDir,
             'databases',
             source.name,
+            'functions',
             typeof fn.function === 'string'
               ? `${fn.function}.yaml`
               : `${fn.function.schema}_${fn.function.name}.yaml`,
