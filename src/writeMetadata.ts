@@ -118,6 +118,7 @@ export function writeMetadata(
     metadata.sources.map((source) => ({
       ...source,
       tables: `!include ${source.name}/tables/tables.yaml`,
+      functions: source.functions && source.functions.length ? `!include ${source.name}/functions/functions.yaml` : undefined
     }))
   );
 
@@ -146,7 +147,7 @@ export function writeMetadata(
       );
     });
 
-    if (source.functions) {
+    if (source.functions && source.functions.length) {
       fs.mkdirSync(path.join(outputDir, 'databases', source.name, 'functions'));
 
       writeFile(
