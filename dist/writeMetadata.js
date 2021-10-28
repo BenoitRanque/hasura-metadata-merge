@@ -110,7 +110,7 @@ function writeMetadata(outputDir, metadata) {
         writeFile([outputDir, 'inherited_roles.yaml'], metadata.inherited_roles);
     }
     fs_1.default.mkdirSync(path_1.default.join(outputDir, 'databases'));
-    writeFile([outputDir, 'databases', 'databases.yaml'], metadata.sources.map(function (source) { return (__assign(__assign({}, source), { tables: "!include " + source.name + "/tables/tables.yaml" })); }));
+    writeFile([outputDir, 'databases', 'databases.yaml'], metadata.sources.map(function (source) { return (__assign(__assign({}, source), { tables: "!include " + source.name + "/tables/tables.yaml", functions: source.functions && source.functions.length ? "!include " + source.name + "/functions/functions.yaml" : undefined })); }));
     metadata.sources.forEach(function (source) {
         fs_1.default.mkdirSync(path_1.default.join(outputDir, 'databases', source.name));
         fs_1.default.mkdirSync(path_1.default.join(outputDir, 'databases', source.name, 'tables'));
@@ -124,7 +124,7 @@ function writeMetadata(outputDir, metadata) {
                 table.table.schema + "_" + table.table.name + ".yaml",
             ], table);
         });
-        if (source.functions) {
+        if (source.functions && source.functions.length) {
             fs_1.default.mkdirSync(path_1.default.join(outputDir, 'databases', source.name, 'functions'));
             writeFile([outputDir, 'databases', source.name, 'functions', 'functions.yaml'], source.functions.map(function (fn) {
                 return typeof fn.function === 'string'
