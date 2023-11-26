@@ -18,7 +18,6 @@ export function mergeMetadataDirectories(
   );
 
   console.log('Begining merge...');
-
   // merge all the metadata
   const { errors, metadata } = mergeMetadata(sources, mergeConfig);
 

@@ -1,6 +1,6 @@
 {
   "name": "hasura-metadata-merge",
-  "version": "1.1.6",
+  "version": "1.1.8",
   "description": "Utility to merge hasura config v3 metadata",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -17,7 +17,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/benoitranque/hasura-metadata-merge.git"
+    "url": "git@github.com:michaelherrmann-nutrien/hasura-metadata-merge.git"
   },
   "dependencies": {
     "@hasura/metadata": "^1.0.2",

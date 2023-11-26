@@ -4,6 +4,9 @@ import {
   CustomFunction,
   HasuraMetadataV2,
   TableEntry,
+  RemoteSchema as RemoteSchemaV2,
+  RemoteRelationship,
+  RemoteRelationshipDef
 } from '@hasura/metadata';
 
 /**
@@ -204,12 +207,17 @@ export interface InheritedRole {
   role_set: string[];
 }
 
+export interface RemoteSchema extends RemoteSchemaV2{
+  remote_relationships: any[]
+}
+
 export interface HasuraMetadataV3
-  extends Omit<HasuraMetadataV2, 'tables' | 'functions' | 'actions'> {
+  extends Omit<HasuraMetadataV2, 'tables' | 'functions' | 'actions' | 'remote_schemas'> {
   actions?: Action[];
   version: 3;
   sources: Source[];
   api_limits?: APILimits;
   rest_endpoints: RestEndpoint[];
   inherited_roles?: InheritedRole[];
+  remote_schemas?: RemoteSchema[]
 }

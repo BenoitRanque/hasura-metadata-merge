@@ -564,7 +564,8 @@ exports.mergeConfig = {
                 name: schemas[0].name,
                 comment: concatenateComments(schemas),
                 definition: schemas[0].definition,
-            }); },
+                remote_relationships: schemas[0].remote_relationships,
+            }); }
         },
     },
 };

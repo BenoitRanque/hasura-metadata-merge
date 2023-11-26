@@ -1,4 +1,4 @@
-import { Action as v2Action, Permissions as Permission, CustomFunction, HasuraMetadataV2, TableEntry } from '@hasura/metadata';
+import { Action as v2Action, Permissions as Permission, CustomFunction, HasuraMetadataV2, TableEntry, RemoteSchema as RemoteSchemaV2 } from '@hasura/metadata';
 /**
  * https://hasura.io/docs/latest/graphql/core/api-reference/syntax-defs.html#fromenv
  */
@@ -172,11 +172,15 @@ export interface InheritedRole {
     role_name: string;
     role_set: string[];
 }
-export interface HasuraMetadataV3 extends Omit<HasuraMetadataV2, 'tables' | 'functions' | 'actions'> {
+export interface RemoteSchema extends RemoteSchemaV2 {
+    remote_relationships: any[];
+}
+export interface HasuraMetadataV3 extends Omit<HasuraMetadataV2, 'tables' | 'functions' | 'actions' | 'remote_schemas'> {
     actions?: Action[];
     version: 3;
     sources: Source[];
     api_limits?: APILimits;
     rest_endpoints: RestEndpoint[];
     inherited_roles?: InheritedRole[];
+    remote_schemas?: RemoteSchema[];
 }
