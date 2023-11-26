@@ -1,6 +1,6 @@
 {
   "name": "hasura-metadata-merge",
-  "version": "1.1.8",
+  "version": "1.1.7",
   "description": "Utility to merge hasura config v3 metadata",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
