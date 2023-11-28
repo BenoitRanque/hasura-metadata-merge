@@ -595,10 +595,11 @@ Definition A: ${JSON.stringify(a.definition)}
 Definition B: ${JSON.stringify(b.definition)}`
           : null,
       merge: (schemas, children) => ({
-        name: schemas[0].name,
-        comment: concatenateComments(schemas),
-        definition: schemas[0].definition,
-      }),
+          name: schemas[0].name,
+          comment: concatenateComments(schemas),
+          definition: schemas[0].definition,
+          remote_relationships: schemas[0].remote_relationships,
+        })
     },
   },
 };

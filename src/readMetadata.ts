@@ -20,10 +20,9 @@ import {
   CustomFunction,
   CustomTypes,
   QueryCollectionEntry,
-  RemoteSchema,
   TableEntry,
 } from '@hasura/metadata';
-
+import { RemoteSchema } from './HasuraMetadataV3'
 function readFileOptional(
   inputPath: string[],
   yamlLoad = true
